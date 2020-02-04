@@ -62,16 +62,10 @@ echo "┌───────────────────────�
 echo "|Configuring iptables"
 echo "└─────────────────────────────────────────"
 sudo iptables -t nat -A  POSTROUTING -o eth0 -j MASQUERADE # Liga NAT no eth0
-
-#iptables -t nat -A PREROUTING -s 192.168.4.0/24 -p tcp --dport 80 -j DNAT --to-destination 192.168.4.1:80
-#Regra em cima redirecciona trafego para o WebServer 
-
-#iptables -t nat -A POSTROUTING -j MASQUERADE
-echo iptables-persistent iptables-persistent/autosave_v4 boolean true | sudo debconf-set-selections
-echo iptables-persistent iptables-persistent/autosave_v6 boolean true | sudo debconf-set-selections
-apt-get -y install iptables-persistent
-
+#redirecciona trafego para o WebServer
+iptables -t nat -A PREROUTING -s 192.168.4.0/24 -p tcp --dport 80 -j DNAT --to-destination 192.168.4.1:80
 rule=net.ipv4.ip_forward=1; sed -i "/^#$rule/ c$rule" /etc/sysctl.conf 
+sh -c "iptables-save > /etc/iptables.ipv4.nat"
 
 # echo "┌─────────────────────────────────────────"
 # echo "|Installing and configuring nginx"
